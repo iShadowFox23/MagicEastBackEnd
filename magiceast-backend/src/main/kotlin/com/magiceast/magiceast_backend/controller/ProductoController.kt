@@ -2,6 +2,7 @@ package com.magiceast.magiceast_backend.controller
 
 import com.magiceast.magiceast_backend.modelo.Producto
 import com.magiceast.magiceast_backend.service.ProductoService
+import jakarta.validation.Valid
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 
@@ -26,7 +27,9 @@ class ProductoController(
     }
 
     @PostMapping
-    fun crearProducto(@RequestBody producto: Producto): ResponseEntity<Producto> {
+    fun crearProducto(
+        @Valid @RequestBody producto: Producto
+    ): ResponseEntity<Producto> {
         val creado = productoService.crear(producto)
         return ResponseEntity.ok(creado)
     }
@@ -34,7 +37,7 @@ class ProductoController(
     @PutMapping("/{id}")
     fun actualizarProducto(
         @PathVariable id: Long,
-        @RequestBody producto: Producto
+        @Valid @RequestBody producto: Producto
     ): ResponseEntity<Producto> {
         val actualizado = productoService.actualizar(id, producto)
         return if (actualizado != null) {

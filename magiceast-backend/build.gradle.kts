@@ -37,8 +37,7 @@ dependencies {
 
 	// Librerías de seguridad necesarias para wallet/mTLS
 	runtimeOnly("com.oracle.database.security:oraclepki")
-	runtimeOnly("com.oracle.database.security:osdt_core")
-	runtimeOnly("com.oracle.database.security:osdt_cert")
+
 
 	// Tests
 	testImplementation("org.springframework.boot:spring-boot-starter-test")

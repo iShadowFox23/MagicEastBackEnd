@@ -27,15 +27,24 @@ dependencies {
 
 	// Desarrollo
 	developmentOnly("org.springframework.boot:spring-boot-devtools")
-	runtimeOnly("com.h2database:h2")
+
+	// --- Oracle JDBC + Wallet ---
+	// BOM para que todas las libs de Oracle usen la misma versión
+	implementation(platform("com.oracle.database.jdbc:ojdbc-bom:23.9.0.25.07"))
+
+	// Driver JDBC
+	runtimeOnly("com.oracle.database.jdbc:ojdbc11")
+
+	// Librerías de seguridad necesarias para wallet/mTLS
+	runtimeOnly("com.oracle.database.security:oraclepki")
+	runtimeOnly("com.oracle.database.security:osdt_core")
+	runtimeOnly("com.oracle.database.security:osdt_cert")
 
 	// Tests
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 	testImplementation("org.springframework.boot:spring-boot-starter-security-test")
-
-	//Oracle DB
-	runtimeOnly("com.oracle.database.jdbc:ojdbc11:23.3.0.23.09")
 }
+
 
 kotlin {
 	jvmToolchain(17)

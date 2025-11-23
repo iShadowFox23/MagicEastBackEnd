@@ -42,5 +42,10 @@ data class Producto(
     @field:NotBlank(message = "La descripción no puede estar vacía")
     @field:Size(max = 2000, message = "La descripción no puede tener más de 2000 caracteres")
     @Column(name = "DESCRIPCION", nullable = false, length = 2000)
-    val descripcion: String
+    val descripcion: String,
+
+    @field:NotBlank(message = "La ruta de la imagen no puede estar vacía")
+    @field:Size(max = 500, message = "La ruta de la imagen no puede tener más de 500 caracteres")
+    @Column(name = "IMAGEN", nullable = false, length = 500)
+    val imagen: String
 )

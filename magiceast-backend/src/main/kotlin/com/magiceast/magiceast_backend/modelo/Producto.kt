@@ -20,10 +20,10 @@ data class Producto(
     @Column(name = "NOMBRE", nullable = false, length = 255)
     val nombre: String,
 
-    @field:NotBlank(message = "La marca no puede estar vacía")
     @field:Size(max = 255, message = "La marca no puede tener más de 255 caracteres")
-    @Column(name = "MARCA", nullable = false, length = 255)
-    val marca: String,
+    @Column(name = "MARCA", nullable = true, length = 255)
+    val marca: String? = null,
+
 
     // Ej: "Mazos,Intro Pack"
     @field:NotBlank(message = "Las categorías no pueden estar vacías")

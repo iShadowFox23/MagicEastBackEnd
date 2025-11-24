@@ -3,7 +3,7 @@ package com.magiceast.magiceast_backend.modelo
 import jakarta.persistence.*
 
 @Entity
-@Table(name = "USERS")
+@Table(name = "Usuarios")
 data class Usuario(
 
     @Id

@@ -31,4 +31,17 @@ class UsuarioService(
 
     fun obtenerPorEmail(email: String): Usuario? =
         usuarioRepository.findByEmail(email)
+
+    // ➤ NUEVO: eliminar por ID
+    fun eliminarUsuario(id: Long): Boolean {
+        val usuario = usuarioRepository.findById(id)
+
+        return if (usuario.isPresent) {
+            usuarioRepository.delete(usuario.get())
+            true
+        } else {
+            false
+        }
+    }
 }
+

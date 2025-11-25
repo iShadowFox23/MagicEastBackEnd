@@ -23,7 +23,6 @@ class UsuarioController(
         }
     }
 
-
     @GetMapping
     fun listar(): List<Usuario> = usuarioService.listarUsuarios()
 
@@ -32,5 +31,15 @@ class UsuarioController(
         val usuario = usuarioService.obtenerPorEmail(email)
         return if (usuario != null) ResponseEntity.ok(usuario)
         else ResponseEntity.notFound().build()
+    }
+
+    // 🔥🔥🔥 AQUI ESTA EL DELETE CORRECTO 🔥🔥🔥
+    @DeleteMapping("/{id}")
+    fun eliminar(@PathVariable id: Long): ResponseEntity<Any> {
+        return if (usuarioService.eliminarUsuario(id)) {
+            ResponseEntity.ok(mapOf("mensaje" to "Usuario eliminado"))
+        } else {
+            ResponseEntity.status(404).body(mapOf("error" to "Usuario no encontrado"))
+        }
     }
 }

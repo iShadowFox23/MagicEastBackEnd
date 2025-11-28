@@ -25,11 +25,9 @@ class SecurityConfig(
             .headers { headers ->
                 headers.frameOptions { it.disable() }
             }
-            .cors { } // opcional, pero útil para front-end
-            .httpBasic { it.disable() }       // desactiva basic auth
-            .formLogin { it.disable() }       // desactiva login form
 
         return http.build()
     }
+
 
 }

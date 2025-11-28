@@ -1,28 +1,38 @@
 package com.magiceast.magiceast_backend.service
 
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 import org.springframework.web.multipart.MultipartFile
 import java.io.File
 
 @Service
-class ImagenService {
+class ImagenService(
 
-    private val uploadDir = "uploads/"
+    @Value("\${app.upload-dir}")
+    private val uploadDirPath: String
 
-    init {
-        val dir = File(uploadDir)
-        if (!dir.exists()) {
-            dir.mkdirs()
+) {
+
+    fun guardarImagen(imagen: MultipartFile): String {
+
+        val absolutePath = File(uploadDirPath).absoluteFile
+
+
+        if (!absolutePath.exists()) {
+            absolutePath.mkdirs()
         }
-    }
 
-    fun guardarImagen(file: MultipartFile): String {
-        val fileName = System.currentTimeMillis().toString() + "_" + (file.originalFilename ?: "imagen")
+        val nombreArchivo = "${System.currentTimeMillis()}_${imagen.originalFilename}"
 
-        val destino = File(uploadDir + fileName)
+        // Destino de las imagenes
+        val destino = File(absolutePath, nombreArchivo)
 
-        file.transferTo(destino)
+        imagen.inputStream.use { input ->
+            destino.outputStream().use { output ->
+                input.copyTo(output)
+            }
+        }
 
-        return fileName
+        return nombreArchivo
     }
 }

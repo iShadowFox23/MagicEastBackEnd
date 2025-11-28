@@ -33,7 +33,6 @@ class UsuarioController(
         else ResponseEntity.notFound().build()
     }
 
-    // 🔥🔥🔥 AQUI ESTA EL DELETE CORRECTO 🔥🔥🔥
     @DeleteMapping("/{id}")
     fun eliminar(@PathVariable id: Long): ResponseEntity<Any> {
         return if (usuarioService.eliminarUsuario(id)) {

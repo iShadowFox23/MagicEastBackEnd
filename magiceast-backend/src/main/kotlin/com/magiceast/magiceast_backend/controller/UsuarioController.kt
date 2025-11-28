@@ -8,7 +8,7 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 
 @RestController
-@RequestMapping("/usuarios")
+@RequestMapping("/api/usuarios")
 class UsuarioController(
     private val usuarioService: UsuarioService
 ) {
@@ -29,8 +29,11 @@ class UsuarioController(
     @GetMapping("/{email}")
     fun buscarPorEmail(@PathVariable email: String): ResponseEntity<Usuario> {
         val usuario = usuarioService.obtenerPorEmail(email)
-        return if (usuario != null) ResponseEntity.ok(usuario)
-        else ResponseEntity.notFound().build()
+        return if (usuario != null) {
+            ResponseEntity.ok(usuario)
+        } else {
+            ResponseEntity.notFound().build()
+        }
     }
 
     @DeleteMapping("/{id}")

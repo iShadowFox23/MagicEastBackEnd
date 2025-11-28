@@ -28,6 +28,13 @@ class JwtAuthFilter(
         }
 
         val token = authHeader.substring(7)
+
+
+        if (token.isBlank() || token == "null" || token == "undefined") {
+            filterChain.doFilter(request, response)
+            return
+        }
+
         val username = jwtService.obtenerUsername(token)
 
         if (username != null &&

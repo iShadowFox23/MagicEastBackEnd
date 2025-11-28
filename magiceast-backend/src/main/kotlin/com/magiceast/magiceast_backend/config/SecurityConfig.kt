@@ -1,34 +1,34 @@
 package com.magiceast.magiceast_backend.config
 
+import com.magiceast.magiceast_backend.security.JwtAuthFilter
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.security.config.Customizer
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.web.SecurityFilterChain
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
 
 @Configuration
-class SecurityConfig {
+class SecurityConfig(
+    private val jwtAuthFilter: JwtAuthFilter
+) {
 
     @Bean
     fun securityFilterChain(http: HttpSecurity): SecurityFilterChain {
+
         http
-            // Desactivar CSRF para que no moleste en desarrollo
             .csrf { it.disable() }
-            // Qué rutas están permitidas sin login
             .authorizeHttpRequests { auth ->
                 auth
+                    .requestMatchers("/auth/**").permitAll()    // login y register
                     .requestMatchers("/h2-console/**").permitAll()
-                    .requestMatchers("/api/**").permitAll()
-                    .anyRequest().permitAll()
+                    .requestMatchers("/api/**").permitAll()     // <-- luego lo ajustas
+                    .anyRequest().authenticated()
             }
-            // Necesario para que H2 console funcione dentro de un <frame>
             .headers { headers ->
-                headers.frameOptions { frame ->
-                    frame.disable()
-                }
+                headers.frameOptions { it.disable() }
             }
-            // Desactivar el formLogin para que no salga el login por defecto
-            .formLogin { it.disable() }
+            .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter::class.java)
             .httpBasic(Customizer.withDefaults())
 
         return http.build()

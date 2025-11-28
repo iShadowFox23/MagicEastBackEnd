@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: jdbc:oracle:thin:@magiceast_high?TNS_ADMIN=C:/Weas/Wallet_MagicEast
+    url: jdbc:oracle:thin:@magiceast_high?TNS_ADMIN=/home/ubuntu/Wallet_MagicEast
     username: ADMIN
     password: MagicEast123
     driver-class-name: oracle.jdbc.OracleDriver
@@ -17,4 +17,7 @@ server:
   port: 8080
 
 app:
-  upload-dir: uploads
+  upload-dir: /home/ubuntu/MagicEastBackEnd/uploads
+jwt:
+  secret: "5fbb2b44cb9c4f628eef2e545d09891f8af7cf0a463beb740fe0582b77e8d3c5290bfa93d7b9c72"
+  expiration-ms: 3600000

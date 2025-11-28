@@ -18,33 +18,18 @@ class SecurityConfig(
 
         http
             .csrf { it.disable() }
-
             .authorizeHttpRequests { auth ->
                 auth
-                    // Endpoints públicos
-                    .requestMatchers("/auth/**").permitAll()            // login
-                    .requestMatchers("/api/usuarios/**").permitAll()     // registrar usuario
-                    .requestMatchers("/h2-console/**").permitAll()
-                    .requestMatchers("/api/productos").permitAll()
-                    .requestMatchers("/api/productos/").permitAll()
-                    .requestMatchers("/api/productos/*").permitAll()
-                    .requestMatchers("/api/productos/**").permitAll()
-
-                    // Todo lo demás requiere autenticación
-                    .anyRequest().authenticated()
+                    .anyRequest().permitAll()
             }
-
-            // Permite el H2 console
             .headers { headers ->
                 headers.frameOptions { it.disable() }
             }
-
-            // JWT filter
-            .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter::class.java)
-
-            // Opción básica para pruebas
-            .httpBasic(Customizer.withDefaults())
+            .cors { } // opcional, pero útil para front-end
+            .httpBasic { it.disable() }       // desactiva basic auth
+            .formLogin { it.disable() }       // desactiva login form
 
         return http.build()
     }
+
 }

@@ -11,14 +11,15 @@ data class Usuario(
     val id: Long = 0,
 
     @Column(nullable = false)
-    val nombre: String,
+    var nombre: String,
 
     @Column(nullable = false, unique = true)
-    val email: String,
+    var email: String,
 
     @Column(nullable = false)
-    val direccion: String,
+    var direccion: String,
 
     @Column(nullable = false)
-    val contrasena: String
+    var contrasena: String
 )
+

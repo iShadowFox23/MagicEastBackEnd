@@ -18,17 +18,27 @@ class SecurityConfig(
 
         http
             .csrf { it.disable() }
+
             .authorizeHttpRequests { auth ->
                 auth
-                    .requestMatchers("/auth/**").permitAll()    // login y register
+                    // Endpoints públicos
+                    .requestMatchers("/auth/**").permitAll()            // login
+                    .requestMatchers("/api/usuarios/**").permitAll()     // registrar usuario
                     .requestMatchers("/h2-console/**").permitAll()
-                    .requestMatchers("/api/**").permitAll()     // <-- luego lo ajustas
+
+                    // Todo lo demás requiere autenticación
                     .anyRequest().authenticated()
             }
+
+            // Permite el H2 console
             .headers { headers ->
                 headers.frameOptions { it.disable() }
             }
+
+            // JWT filter
             .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter::class.java)
+
+            // Opción básica para pruebas
             .httpBasic(Customizer.withDefaults())
 
         return http.build()

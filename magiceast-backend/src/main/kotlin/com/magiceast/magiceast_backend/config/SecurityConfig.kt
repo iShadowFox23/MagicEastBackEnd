@@ -25,6 +25,7 @@ class SecurityConfig(
                     .requestMatchers("/auth/**").permitAll()            // login
                     .requestMatchers("/api/usuarios/**").permitAll()     // registrar usuario
                     .requestMatchers("/h2-console/**").permitAll()
+                    .requestMatchers("/api/productos/**").permitAll()
 
                     // Todo lo demás requiere autenticación
                     .anyRequest().authenticated()

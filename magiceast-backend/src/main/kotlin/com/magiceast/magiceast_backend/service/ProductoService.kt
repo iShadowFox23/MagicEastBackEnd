@@ -2,6 +2,7 @@ package com.magiceast.magiceast_backend.service
 
 import com.magiceast.magiceast_backend.modelo.Producto
 import com.magiceast.magiceast_backend.repositorio.ProductoRepository
+import jakarta.transaction.Transactional
 import org.springframework.stereotype.Service
 
 @Service
@@ -27,7 +28,8 @@ class ProductoService(
             categorias = producto.categorias,
             precio = producto.precio,
             stock = producto.stock,
-            descripcion = producto.descripcion
+            descripcion = producto.descripcion,
+            imagen = producto.imagen
         )
 
         return productoRepository.save(actualizado)
@@ -37,5 +39,29 @@ class ProductoService(
         if (productoRepository.existsById(id)) {
             productoRepository.deleteById(id)
         }
+    }
+
+
+    @Transactional
+    fun reducirStock(productoId: Long, cantidad: Int) {
+        val producto = productoRepository.findById(productoId).orElse(null)
+            ?: throw IllegalArgumentException("Producto con ID $productoId no encontrado")
+
+        if (cantidad <= 0) {
+            throw IllegalArgumentException("La cantidad debe ser mayor a 0")
+        }
+
+        if (producto.stock < cantidad) {
+            throw IllegalStateException(
+                "Stock insuficiente para '${producto.nombre}': " +
+                        "stock actual = ${producto.stock}, solicitado = $cantidad"
+            )
+        }
+
+        val actualizado = producto.copy(
+            stock = producto.stock - cantidad
+        )
+
+        productoRepository.save(actualizado)
     }
 }

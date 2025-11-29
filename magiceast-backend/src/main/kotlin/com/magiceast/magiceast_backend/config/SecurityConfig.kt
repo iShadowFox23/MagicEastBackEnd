@@ -17,7 +17,9 @@ class SecurityConfig {
         http
             .csrf { it.disable() }
             .authorizeHttpRequests { auth ->
-                auth.anyRequest().permitAll()
+                auth
+                .anyRequest()
+                .permitAll()
             }
             .sessionManagement { it.disable() }
             .securityContext { it.disable() }

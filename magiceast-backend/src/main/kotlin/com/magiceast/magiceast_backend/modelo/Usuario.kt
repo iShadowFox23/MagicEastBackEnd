@@ -35,16 +35,16 @@ data class Usuario(
 
     @Column(nullable = false)
     @field:Schema(
-        description = "Dirección de despacho o residencia del usuario.",
+        description = "Dirección del usuario.",
         example = "Av. Siempre Viva 742, Valparaíso"
     )
     var direccion: String,
 
     @Column(nullable = false)
     @field:Schema(
-        description = "Contraseña almacenada en formato encriptado (no debe exponerse en respuestas).",
-        example = "$2a$10hashDeEjemplo1234567890",
-        accessMode = Schema.AccessMode.WRITE_ONLY
+        description = "Contraseña almacenada en formato encriptado (bcrypt).",
+        example = "\$2a\$10\$hashDeEjemplo1234567890",
+        accessMode = Schema.AccessMode.READ_WRITE
     )
     var contrasena: String
 )

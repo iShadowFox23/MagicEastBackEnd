@@ -22,10 +22,23 @@ class CheckoutController(
     @PostMapping
     fun procesarCompra(@RequestBody compra: CompraDTO): ResponseEntity<String> {
 
-        compra.items.forEach { item ->
-            productoService.reducirStock(item.productoId, item.cantidad)
-        }
+        return try {
 
-        return ResponseEntity.ok("Compra procesada correctamente")
+
+            compra.items.forEach { item ->
+                productoService.reducirStock(item.productoId, item.cantidad)
+            }
+
+
+            ResponseEntity.ok("Compra procesada correctamente")
+
+        } catch (e: IllegalStateException) {
+
+            ResponseEntity.badRequest().body(e.message)
+        } catch (e: Exception) {
+
+            ResponseEntity.internalServerError()
+                .body("Error interno al procesar la compra: ${e.message}")
+        }
     }
 }

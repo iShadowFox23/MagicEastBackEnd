@@ -63,14 +63,22 @@ class UsuarioController(
         }
     }
 
-    @PatchMapping("/{id}/rol")
+    @PutMapping("/{id}/rol")
     fun actualizarRol(
         @PathVariable id: Long,
-        @RequestParam rol: String
+        @RequestBody body: Map<String, String>
     ): ResponseEntity<Any> {
-        val usuario = usuarioService.obtenerUsuario(id) ?: return ResponseEntity.status(404).body(mapOf("error" to "Usuario no encontrado"))
-        usuario.rol = rol
+
+        val usuario = usuarioService.obtenerUsuario(id)
+            ?: return ResponseEntity.status(404).body(mapOf("error" to "Usuario no encontrado"))
+
+        val nuevoRol = body["rol"] ?: return ResponseEntity.badRequest().body(mapOf("error" to "Rol no especificado"))
+
+        usuario.rol = nuevoRol
+
         val actualizado = usuarioService.guardarUsuario(usuario)
+
         return ResponseEntity.ok(actualizado)
     }
+
 }

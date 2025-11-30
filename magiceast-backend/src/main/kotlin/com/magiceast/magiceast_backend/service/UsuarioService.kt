@@ -25,20 +25,23 @@ class UsuarioService(
 
         val contrasenaEncriptada: String = encoder.encode(request.contrasena) ?: throw IllegalStateException("Error al encriptar contraseña")
 
-
+        val rolAsignado =
+            if (request.email == "magiceast@admin.cl") "ADMIN"
+            else "USER"
 
         val usuario = Usuario(
             nombre = request.nombre,
             email = request.email,
             direccion = request.direccion,
-            contrasena = contrasenaEncriptada
+            contrasena = contrasenaEncriptada,
+            rol = rolAsignado
         )
 
         return usuarioRepository.save(usuario)
     }
 
     fun listarUsuarios(): List<Usuario> =
-        usuarioRepository.findAll().filterNotNull()   // ← FIX IMPORTANTE
+        usuarioRepository.findAll().filterNotNull()
 
     fun obtenerPorEmail(email: String): Usuario? =
         usuarioRepository.findByEmail(email)

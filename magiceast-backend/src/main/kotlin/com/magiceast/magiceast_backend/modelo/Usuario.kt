@@ -46,5 +46,12 @@ data class Usuario(
         example = "\$2a\$10\$hashDeEjemplo1234567890",
         accessMode = Schema.AccessMode.READ_WRITE
     )
-    var contrasena: String
+    var contrasena: String,
+
+    @Column(nullable = false)
+    @field:Schema(
+        description = "Rol del usuario en el sistema.",
+        example = "USER"
+    )
+    var rol: String = "USER"
 )

@@ -54,4 +54,10 @@ class UsuarioService(
             false
         }
     }
+
+    fun obtenerUsuario(id: Long): Usuario? =
+        usuarioRepository.findById(id).orElse(null)
+
+    fun guardarUsuario(usuario: Usuario): Usuario =
+        usuarioRepository.save(usuario)
 }

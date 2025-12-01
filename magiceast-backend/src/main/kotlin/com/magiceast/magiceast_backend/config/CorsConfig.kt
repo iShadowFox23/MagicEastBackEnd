@@ -13,7 +13,7 @@ class CorsConfig {
         return object : WebMvcConfigurer {
             override fun addCorsMappings(registry: CorsRegistry) {
                 registry.addMapping("/**")
-                    .allowedOrigins("http://localhost:5173","http://3.135.235.62:8080")
+                    .allowedOrigins("http://localhost:5173","http://3.135.235.62:8080","magiceastreact-production-d896.up.railway.app")
                     .allowedMethods("*")
                     .allowedHeaders("*")
                     .allowCredentials(true)

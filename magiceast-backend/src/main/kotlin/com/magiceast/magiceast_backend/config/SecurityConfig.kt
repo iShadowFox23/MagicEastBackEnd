@@ -31,6 +31,8 @@ class SecurityConfig(
         http
             .csrf { it.disable() }
             .cors { }
+
+            .authorizeHttpRequests { auth ->
                 auth
                     .requestMatchers("/auth/**", "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
                     .requestMatchers(HttpMethod.POST, "/api/usuarios").permitAll()
@@ -39,7 +41,11 @@ class SecurityConfig(
                     .requestMatchers("/**").hasRole("ADMIN")
                     .anyRequest().authenticated()
             }
-            .sessionManagement { it.sessionCreationPolicy(SessionCreationPolicy.STATELESS) }
+
+            .sessionManagement {
+                it.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+            }
+
             .authenticationProvider(authenticationProvider())
             .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter::class.java)
 

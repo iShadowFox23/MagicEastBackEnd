@@ -42,6 +42,15 @@ data class Producto(
     )
     val marca: String? = null,
 
+    @field:Size(max = 255, message = "El set no puede tener más de 255 caracteres")
+    @Column(name = "SET_NAME", nullable = true, length = 255)
+    @field:Schema(
+        description = "Nombre del set o expansión (opcional).",
+        example = "Commander 2025",
+        nullable = true
+    )
+    val set: String? = null,
+
     @field:NotBlank(message = "Las categorías no pueden estar vacías")
     @field:Size(max = 500, message = "Las categorías no pueden tener más de 500 caracteres")
     @Column(name = "CATEGORIAS", nullable = false, length = 500)

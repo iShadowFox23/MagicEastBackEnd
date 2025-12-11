@@ -159,6 +159,9 @@ class ProductoController(
         @Parameter(description = "Marca del producto", example = "Magic East")
         @RequestParam marca: String?,
 
+        @Parameter(description = "Nombre del set o expansión", example = "Commander 2025")
+        @RequestParam(required = false) set: String?,
+
         @Parameter(description = "Categorías del producto separadas por coma", example = "Preconstruidos,Mazos")
         @RequestParam categorias: String,
 
@@ -183,6 +186,7 @@ class ProductoController(
         val producto = Producto(
             nombre = nombre,
             marca = marca,
+            set = set,
             categorias = categorias,
             precio = precio,
             stock = stock,

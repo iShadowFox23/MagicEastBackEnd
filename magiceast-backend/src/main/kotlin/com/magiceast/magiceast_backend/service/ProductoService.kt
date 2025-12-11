@@ -29,7 +29,8 @@ class ProductoService(
             precio = producto.precio,
             stock = producto.stock,
             descripcion = producto.descripcion,
-            imagen = producto.imagen
+            imagen = producto.imagen,
+            set = producto.set
         )
 
         return productoRepository.save(actualizado)

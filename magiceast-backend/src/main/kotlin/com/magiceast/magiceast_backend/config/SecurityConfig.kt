@@ -6,7 +6,6 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpMethod
 import org.springframework.security.authentication.AuthenticationManager
-import org.springframework.security.authentication.AuthenticationProvider
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
@@ -15,6 +14,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.security.web.SecurityFilterChain
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer
 import org.springframework.web.cors.CorsConfiguration
 import org.springframework.web.cors.CorsConfigurationSource
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource
@@ -29,37 +30,35 @@ class SecurityConfig(
     fun securityFilterChain(http: HttpSecurity): SecurityFilterChain {
 
         http
-            .csrf().disable()
-            .cors().and()
+            .csrf(AbstractHttpConfigurer::disable)
+            .cors {}
 
-            .authorizeRequests()
-                .antMatchers(HttpMethod.OPTIONS, "/**").permitAll() // 🔥 CORS FIX
-                .antMatchers(
-                    "/auth/**",
-                    "/v3/api-docs/**",
-                    "/swagger-ui/**",
-                    "/swagger-ui.html"
-                ).permitAll()
-                .antMatchers(HttpMethod.POST, "/api/usuarios").permitAll()
-                .antMatchers(HttpMethod.GET, "/api/productos/**").permitAll()
-                .antMatchers("/api/checkout/**").authenticated()
-                .antMatchers("/api/ordenes/**").authenticated()
-                .antMatchers("/**").hasRole("ADMIN")
-                .anyRequest().authenticated()
-            .and()
+        http
+            .sessionManagement {
+                it.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+            }
 
-            .sessionManagement()
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-            .and()
+        http
+            .authorizeHttpRequests {
+                it.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                it.requestMatchers("/auth/**").permitAll()
+                it.requestMatchers("/v3/api-docs/**").permitAll()
+                it.requestMatchers("/swagger-ui/**").permitAll()
+                it.requestMatchers(HttpMethod.POST, "/api/usuarios").permitAll()
+                it.requestMatchers(HttpMethod.GET, "/api/productos/**").permitAll()
+                it.requestMatchers("/api/checkout/**").authenticated()
+                it.requestMatchers("/api/ordenes/**").authenticated()
+                it.anyRequest().hasRole("ADMIN")
+            }
 
-            .authenticationProvider(authenticationProvider())
+        http
             .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter::class.java)
 
         return http.build()
     }
 
     @Bean
-    fun authenticationProvider(): AuthenticationProvider {
+    fun authenticationProvider(): DaoAuthenticationProvider {
         val provider = DaoAuthenticationProvider()
         provider.setUserDetailsService(usuarioDetailsService)
         provider.setPasswordEncoder(passwordEncoder())
@@ -77,7 +76,7 @@ class SecurityConfig(
     @Bean
     fun corsConfigurationSource(): CorsConfigurationSource {
         val config = CorsConfiguration()
-        config.allowedOrigins = listOf("*") // en prod usa tu dominio
+        config.allowedOrigins = listOf("*")
         config.allowedMethods = listOf("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS")
         config.allowedHeaders = listOf("*")
         config.allowCredentials = false

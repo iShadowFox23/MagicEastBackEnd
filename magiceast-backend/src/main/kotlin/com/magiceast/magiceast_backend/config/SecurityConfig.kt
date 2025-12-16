@@ -38,6 +38,7 @@ class SecurityConfig(
                     .requestMatchers(HttpMethod.POST, "/api/usuarios").permitAll()
                     .requestMatchers(HttpMethod.GET, "/api/productos/**").permitAll()
                     .requestMatchers("/api/checkout/**").authenticated()
+                    .requestMatchers("/api/ordenes/**").authenticated()
                     .requestMatchers("/**").hasRole("ADMIN")
                     .anyRequest().authenticated()
             }

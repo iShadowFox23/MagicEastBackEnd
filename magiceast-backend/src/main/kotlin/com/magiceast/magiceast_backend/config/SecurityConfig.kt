@@ -28,64 +28,61 @@ class SecurityConfig(
     @Bean
     fun securityFilterChain(http: HttpSecurity): SecurityFilterChain {
 
-        http
-            .csrf().disable()
-            .cors().and()
+        http {
+            csrf { disable() }
+            cors { }
 
-            .authorizeRequests()
-                .antMatchers(HttpMethod.OPTIONS, "/**").permitAll() // 🔥 CLAVE CORS
-                .antMatchers(
-                    "/auth/**",
-                    "/v3/api-docs/**",
-                    "/swagger-ui/**",
-                    "/swagger-ui.html"
-                ).permitAll()
-                .antMatchers(HttpMethod.POST, "/api/usuarios").permitAll()
-                .antMatchers(HttpMethod.GET, "/api/productos/**").permitAll()
-                .antMatchers("/api/checkout/**").authenticated()
-                .antMatchers("/api/ordenes/**").authenticated()
-                .antMatchers("/**").hasRole("ADMIN")
-                .anyRequest().authenticated()
-            .and()
+            authorizeHttpRequests {
+                authorize(HttpMethod.OPTIONS, "/**", permitAll)
+                authorize("/auth/**", permitAll)
+                authorize("/v3/api-docs/**", permitAll)
+                authorize("/swagger-ui/**", permitAll)
+                authorize("/swagger-ui.html", permitAll)
+                authorize(HttpMethod.POST, "/api/usuarios", permitAll)
+                authorize(HttpMethod.GET, "/api/productos/**", permitAll)
+                authorize("/api/checkout/**", authenticated)
+                authorize("/api/ordenes/**", authenticated)
+                authorize("/**", hasRole("ADMIN"))
+                authorize(anyRequest, authenticated)
+            }
 
-            .sessionManagement()
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-            .and()
+            sessionManagement {
+                sessionCreationPolicy = SessionCreationPolicy.STATELESS
+            }
 
-            .authenticationProvider(authenticationProvider())
-            .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter::class.java)
+            authenticationProvider(authenticationProvider())
+            addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter::class.java)
+        }
 
         return http.build()
     }
 
     @Bean
-    fun authenticationProvider(): AuthenticationProvider {
-        val authProvider = DaoAuthenticationProvider()
-        authProvider.setUserDetailsService(usuarioDetailsService)
-        authProvider.setPasswordEncoder(passwordEncoder())
-        return authProvider
-    }
+    fun authenticationProvider(): AuthenticationProvider =
+        DaoAuthenticationProvider().apply {
+            setUserDetailsService(usuarioDetailsService)
+            setPasswordEncoder(passwordEncoder())
+        }
 
     @Bean
-    fun authenticationManager(config: AuthenticationConfiguration): AuthenticationManager {
-        return config.authenticationManager
-    }
+    fun authenticationManager(
+        config: AuthenticationConfiguration
+    ): AuthenticationManager = config.authenticationManager
 
     @Bean
-    fun passwordEncoder(): PasswordEncoder {
-        return BCryptPasswordEncoder()
-    }
+    fun passwordEncoder(): PasswordEncoder = BCryptPasswordEncoder()
 
     @Bean
     fun corsConfigurationSource(): CorsConfigurationSource {
-        val config = CorsConfiguration()
-        config.allowedOrigins = listOf("*") // 🔧 en prod pon tu dominio
-        config.allowedMethods = listOf("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS")
-        config.allowedHeaders = listOf("*")
-        config.allowCredentials = false
+        val config = CorsConfiguration().apply {
+            allowedOrigins = listOf("*")
+            allowedMethods = listOf("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS")
+            allowedHeaders = listOf("*")
+            allowCredentials = false
+        }
 
-        val source = UrlBasedCorsConfigurationSource()
-        source.registerCorsConfiguration("/**", config)
-        return source
+        return UrlBasedCorsConfigurationSource().apply {
+            registerCorsConfiguration("/**", config)
+        }
     }
 }

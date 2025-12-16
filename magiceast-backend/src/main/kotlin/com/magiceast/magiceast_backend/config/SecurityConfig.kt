@@ -28,41 +28,43 @@ class SecurityConfig(
     @Bean
     fun securityFilterChain(http: HttpSecurity): SecurityFilterChain {
 
-        http {
-            csrf { disable() }
-            cors { }
+        http
+            .csrf().disable()
+            .cors().and()
 
-            authorizeHttpRequests {
-                authorize(HttpMethod.OPTIONS, "/**", permitAll)
-                authorize("/auth/**", permitAll)
-                authorize("/v3/api-docs/**", permitAll)
-                authorize("/swagger-ui/**", permitAll)
-                authorize("/swagger-ui.html", permitAll)
-                authorize(HttpMethod.POST, "/api/usuarios", permitAll)
-                authorize(HttpMethod.GET, "/api/productos/**", permitAll)
-                authorize("/api/checkout/**", authenticated)
-                authorize("/api/ordenes/**", authenticated)
-                authorize("/**", hasRole("ADMIN"))
-                authorize(anyRequest, authenticated)
-            }
+            .authorizeRequests()
+                .antMatchers(HttpMethod.OPTIONS, "/**").permitAll() // 🔥 CORS FIX
+                .antMatchers(
+                    "/auth/**",
+                    "/v3/api-docs/**",
+                    "/swagger-ui/**",
+                    "/swagger-ui.html"
+                ).permitAll()
+                .antMatchers(HttpMethod.POST, "/api/usuarios").permitAll()
+                .antMatchers(HttpMethod.GET, "/api/productos/**").permitAll()
+                .antMatchers("/api/checkout/**").authenticated()
+                .antMatchers("/api/ordenes/**").authenticated()
+                .antMatchers("/**").hasRole("ADMIN")
+                .anyRequest().authenticated()
+            .and()
 
-            sessionManagement {
-                sessionCreationPolicy = SessionCreationPolicy.STATELESS
-            }
+            .sessionManagement()
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+            .and()
 
-            authenticationProvider(authenticationProvider())
-            addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter::class.java)
-        }
+            .authenticationProvider(authenticationProvider())
+            .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter::class.java)
 
         return http.build()
     }
 
     @Bean
-    fun authenticationProvider(): AuthenticationProvider =
-        DaoAuthenticationProvider().apply {
-            setUserDetailsService(usuarioDetailsService)
-            setPasswordEncoder(passwordEncoder())
-        }
+    fun authenticationProvider(): AuthenticationProvider {
+        val provider = DaoAuthenticationProvider()
+        provider.setUserDetailsService(usuarioDetailsService)
+        provider.setPasswordEncoder(passwordEncoder())
+        return provider
+    }
 
     @Bean
     fun authenticationManager(
@@ -74,15 +76,14 @@ class SecurityConfig(
 
     @Bean
     fun corsConfigurationSource(): CorsConfigurationSource {
-        val config = CorsConfiguration().apply {
-            allowedOrigins = listOf("*")
-            allowedMethods = listOf("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS")
-            allowedHeaders = listOf("*")
-            allowCredentials = false
-        }
+        val config = CorsConfiguration()
+        config.allowedOrigins = listOf("*") // en prod usa tu dominio
+        config.allowedMethods = listOf("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS")
+        config.allowedHeaders = listOf("*")
+        config.allowCredentials = false
 
-        return UrlBasedCorsConfigurationSource().apply {
-            registerCorsConfiguration("/**", config)
-        }
+        val source = UrlBasedCorsConfigurationSource()
+        source.registerCorsConfiguration("/**", config)
+        return source
     }
 }

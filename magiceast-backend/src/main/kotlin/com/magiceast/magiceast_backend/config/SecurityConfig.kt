@@ -29,24 +29,28 @@ class SecurityConfig(
     fun securityFilterChain(http: HttpSecurity): SecurityFilterChain {
 
         http
-            .csrf { it.disable() }
-            .cors { }
+            .csrf().disable()
+            .cors().and()
 
-            .authorizeHttpRequests { auth ->
-                auth
-                    requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                    .requestMatchers("/auth/**", "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
-                    .requestMatchers(HttpMethod.POST, "/api/usuarios").permitAll()
-                    .requestMatchers(HttpMethod.GET, "/api/productos/**").permitAll()
-                    .requestMatchers("/api/checkout/**").authenticated()
-                    .requestMatchers("/api/ordenes/**").authenticated()
-                    .requestMatchers("/**").hasRole("ADMIN")
-                    .anyRequest().authenticated()
-            }
+            .authorizeRequests()
+                .antMatchers(HttpMethod.OPTIONS, "/**").permitAll() // 🔥 CLAVE CORS
+                .antMatchers(
+                    "/auth/**",
+                    "/v3/api-docs/**",
+                    "/swagger-ui/**",
+                    "/swagger-ui.html"
+                ).permitAll()
+                .antMatchers(HttpMethod.POST, "/api/usuarios").permitAll()
+                .antMatchers(HttpMethod.GET, "/api/productos/**").permitAll()
+                .antMatchers("/api/checkout/**").authenticated()
+                .antMatchers("/api/ordenes/**").authenticated()
+                .antMatchers("/**").hasRole("ADMIN")
+                .anyRequest().authenticated()
+            .and()
 
-            .sessionManagement {
-                it.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-            }
+            .sessionManagement()
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+            .and()
 
             .authenticationProvider(authenticationProvider())
             .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter::class.java)
@@ -56,7 +60,8 @@ class SecurityConfig(
 
     @Bean
     fun authenticationProvider(): AuthenticationProvider {
-        val authProvider = DaoAuthenticationProvider(usuarioDetailsService)
+        val authProvider = DaoAuthenticationProvider()
+        authProvider.setUserDetailsService(usuarioDetailsService)
         authProvider.setPasswordEncoder(passwordEncoder())
         return authProvider
     }
@@ -74,8 +79,8 @@ class SecurityConfig(
     @Bean
     fun corsConfigurationSource(): CorsConfigurationSource {
         val config = CorsConfiguration()
-        config.allowedOrigins = listOf("*")
-        config.allowedMethods = listOf("GET", "POST", "PUT", "DELETE", "OPTIONS")
+        config.allowedOrigins = listOf("*") // 🔧 en prod pon tu dominio
+        config.allowedMethods = listOf("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS")
         config.allowedHeaders = listOf("*")
         config.allowCredentials = false
 
